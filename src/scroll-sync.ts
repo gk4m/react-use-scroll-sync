@@ -23,17 +23,17 @@ const updateScrollsPosition = <T extends HTMLElement>(
   options: Options
 ) => {
   const scrollLeftOffset =
-    target.scrollLeft / (target.scrollWidth - target.offsetWidth)
+    target.scrollLeft / (target.scrollWidth - target.clientWidth)
 
   const scrollTopOffset =
-    target.scrollTop / (target.scrollHeight - target.offsetHeight)
+    target.scrollTop / (target.scrollHeight - target.clientHeight)
 
   refs.forEach(({ current }) => {
     if (!current) return
 
     if (options.vertical) {
       const position = options.proportional
-        ? scrollTopOffset * (current.scrollHeight - current.offsetHeight)
+        ? scrollTopOffset * (current.scrollHeight - current.clientHeight)
         : target.scrollTop
 
       current.scrollTop = Math.round(position)
@@ -41,7 +41,7 @@ const updateScrollsPosition = <T extends HTMLElement>(
 
     if (options.horizontal) {
       const position = options.proportional
-        ? scrollLeftOffset * (current.scrollWidth - current.offsetWidth)
+        ? scrollLeftOffset * (current.scrollWidth - current.clientWidth)
         : target.scrollLeft
 
       current.scrollLeft = Math.round(position)
