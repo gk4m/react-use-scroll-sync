@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "parcel index.html",
-    "build": "parcel build index.html"
+    "build": "parcel build index.html",
+    "deploy": "npm run build && push-dir --dir=dist --branch=gh-pages --allow-unclean --force"
   },
   "dependencies": {
     "react-app-polyfill": "^1.0.0"
