@@ -6,6 +6,17 @@
   "files": [
     "dist"
   ],
+  "keywords": [
+    "react",
+    "react-hooks",
+    "hooks",
+    "typescript",
+    "dom",
+    "scroll",
+    "scrolling",
+    "sync",
+    "synchronization"
+  ],
   "scripts": {
     "start": "tsdx watch",
     "build": "tsdx build",
