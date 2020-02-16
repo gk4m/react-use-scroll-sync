@@ -1,1 +1,1 @@
-export * from './scroll-sync';
+export * from "./scroll-sync"

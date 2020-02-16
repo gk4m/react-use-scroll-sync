@@ -64,11 +64,13 @@ export const useSrollSync: ScrollSync = (refs, options) => {
 
     const refsWithoutTarget = refs.filter(({ current }) => current !== target)
 
-    updateScrollsPosition(
-      target as HTMLElement,
-      refsWithoutTarget,
-      scrollSyncOptions
-    )
+    window.requestAnimationFrame(() => {
+      updateScrollsPosition(
+        target as HTMLElement,
+        refsWithoutTarget,
+        scrollSyncOptions
+      )
+    })
   }
 
   useEffect(() => {
