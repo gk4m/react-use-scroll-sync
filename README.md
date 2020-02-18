@@ -6,6 +6,8 @@
 Custom react hook for synced scroll position across multiple scrollable
 elements.
 
+![preview](https://media.giphy.com/media/SVlK5t83KhozwUfbKK/giphy.gif)
+
 ## Demo
 
 https://gk4m.github.io/react-use-scroll-sync/
