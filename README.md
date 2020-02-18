@@ -1,6 +1,6 @@
 # react-use-scroll-sync
 
-[![npm version](https://img.shields.io/npm/v/react-use-scroll-sync.svg)](https://www.npmjs.com/package/react-use-scroll-sync)
+[![npm version](https://badge.fury.io/js/react-use-scroll-sync.svg)](https://badge.fury.io/js/react-use-scroll-sync)
 [![npm downloads](https://img.shields.io/npm/dt/react-use-scroll-sync.svg)](https://www.npmjs.com/package/react-use-scroll-sync)
 
 Custom react hook for synced scroll position across multiple scrollable
