@@ -9,7 +9,9 @@
     "deploy": "npm run build && push-dir --dir=dist --branch=gh-pages --allow-unclean --force"
   },
   "dependencies": {
-    "react-app-polyfill": "^1.0.0"
+    "@types/styled-components": "4.4.3",
+    "react-app-polyfill": "^1.0.0",
+    "styled-components": "5.0.1"
   },
   "alias": {
     "react": "../node_modules/react",
