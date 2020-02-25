@@ -29,13 +29,13 @@ npm i react-use-scroll-sync --save
 ## How to use
 ```typescript
 import * as React from "react"
-import { useSrollSync } from "react-use-scroll-sync"
+import { useScrollSync } from "react-use-scroll-sync"
 
 const App = () => {
   const ref1 = React.useRef<HTMLDivElement>(null)
   const ref2 = React.useRef<HTMLDivElement>(null)
 
-  useSrollSync([ref1, ref2], {
+  useScrollSync([ref1, ref2], {
     horizontal: true,
     vertical: true,
     proportional: true

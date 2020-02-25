@@ -2,7 +2,7 @@ import "react-app-polyfill/ie11"
 import * as React from "react"
 import * as ReactDOM from "react-dom"
 import styled from "styled-components"
-import { useSrollSync, Options } from "../."
+import { useScrollSync, Options } from "../."
 
 const text = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendis
           sedictum sagittis augue, quis scelerisque mauris euismod vitae.
@@ -55,6 +55,7 @@ const Box = styled.div<{ width?: number }>`
 const Card = styled.div`
   padding: 15px;
   margin: 10px;
+  max-height: 320px;
   background: #fff;
   box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
     0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
@@ -90,7 +91,7 @@ const App = () => {
   const ref3 = React.useRef<HTMLDivElement>(null)
   const ref4 = React.useRef<HTMLDivElement>(null)
 
-  useSrollSync([ref1, ref2, ref3, ref4], options)
+  useScrollSync([ref1, ref2, ref3, ref4], options)
 
   return (
     <Page>

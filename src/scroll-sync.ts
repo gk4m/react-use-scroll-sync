@@ -49,7 +49,7 @@ const updateScrollsPosition = <T extends HTMLElement>(
   })
 }
 
-export const useSrollSync: ScrollSync = (refs, options) => {
+export const useScrollSync: ScrollSync = (refs, options) => {
   if (refs.length < 2) {
     throw Error("You need to pass at least two refs")
   }
