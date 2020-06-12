@@ -1,15 +1,18 @@
-import { RefObject, useEffect } from "react"
+import { RefObject, useEffect, useRef } from "react"
+import throttle from "lodash/throttle"
 
 export type Options = {
   horizontal?: boolean
   vertical?: boolean
   proportional?: boolean
+  throttleWaitTime?: number // ms
 }
 
 const defaultOptions: Options = {
   horizontal: true,
   vertical: true,
-  proportional: true
+  proportional: true,
+  throttleWaitTime: 100
 }
 
 type ScrollSync = <T extends HTMLElement>(
@@ -73,14 +76,22 @@ export const useScrollSync: ScrollSync = (refs, options) => {
     })
   }
 
+  const throttleScrollRef = useRef(
+    throttle((e: Event) => handleScroll(e), scrollSyncOptions.throttleWaitTime)
+  )
+
+  useEffect(() => throttleScrollRef.current.cancel, [])
+
   useEffect(() => {
+    const scrollEvent = throttleScrollRef.current
+
     refs.forEach(({ current }) =>
-      current?.addEventListener("scroll", handleScroll)
+      current?.addEventListener("scroll", scrollEvent)
     )
 
     return () => {
       refs.forEach(({ current }) =>
-        current?.removeEventListener("scroll", handleScroll)
+        current?.removeEventListener("scroll", scrollEvent)
       )
     }
   }, [refs])
