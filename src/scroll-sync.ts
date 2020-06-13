@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useRef } from "react"
+import { RefObject, useEffect, useMemo, useRef } from "react"
 import throttle from "lodash/throttle"
 
 export type Options = {
@@ -52,38 +52,55 @@ const updateScrollsPosition = <T extends HTMLElement>(
   })
 }
 
+const useScrollSyncOptions = (options = {}) =>
+  useMemo(
+    () => ({
+      ...defaultOptions,
+      ...options
+    }),
+    [JSON.stringify(options)] // eslint-disable-line react-hooks/exhaustive-deps
+  )
+
 export const useScrollSync: ScrollSync = (refs, options) => {
   if (refs.length < 2) {
     throw Error("You need to pass at least two refs")
   }
 
-  const scrollSyncOptions = {
-    ...defaultOptions,
-    ...options
-  }
-
-  const handleScroll = ({ target }: Event) => {
-    if (!target) throw Error("Event target shouldn't be null")
-
-    const refsWithoutTarget = refs.filter(({ current }) => current !== target)
-
-    window.requestAnimationFrame(() => {
-      updateScrollsPosition(
-        target as HTMLElement,
-        refsWithoutTarget,
-        scrollSyncOptions
-      )
-    })
-  }
-
-  const throttleScrollRef = useRef(
-    throttle((e: Event) => handleScroll(e), scrollSyncOptions.throttleWaitTime)
-  )
-
-  useEffect(() => throttleScrollRef.current.cancel, [])
+  const scrollSyncOptions = useScrollSyncOptions(options)
+  const throttleScrollRef = useRef() as React.MutableRefObject<Function>
 
   useEffect(() => {
-    const scrollEvent = throttleScrollRef.current
+    const handleScroll = (
+      currentRefs: Array<React.MutableRefObject<HTMLElement>>,
+      { target }: Event
+    ) => {
+      if (!target) throw Error("Event target shouldn't be null")
+
+      const refsWithoutTarget = currentRefs.filter(
+        ({ current }) => current !== target
+      )
+
+      window.requestAnimationFrame(() => {
+        updateScrollsPosition(
+          target as HTMLElement,
+          refsWithoutTarget,
+          scrollSyncOptions
+        )
+      })
+    }
+
+    const scrollEvent = throttle(
+      handleScroll,
+      scrollSyncOptions.throttleWaitTime
+    )
+
+    throttleScrollRef.current = scrollEvent
+
+    return scrollEvent.cancel
+  }, [scrollSyncOptions, throttleScrollRef])
+
+  useEffect(() => {
+    const scrollEvent = (e: Event) => throttleScrollRef.current(refs, e)
 
     refs.forEach(({ current }) =>
       current?.addEventListener("scroll", scrollEvent)
@@ -94,5 +111,5 @@ export const useScrollSync: ScrollSync = (refs, options) => {
         current?.removeEventListener("scroll", scrollEvent)
       )
     }
-  }, [refs])
+  }, [refs, throttleScrollRef])
 }
