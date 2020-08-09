@@ -15,6 +15,7 @@ jobs:
       - name: Install and Build 🔧
         run: |
           cd example
+          pwd
           npm install
           npm run-script build
       - name: Deploy 🚀
