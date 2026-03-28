@@ -8,6 +8,14 @@ elements.
 
 ## Installation
 
+Requires `react >= 18`.
+
+```bash
+npm install react-use-scroll-sync
+```
+
+or
+
 ```bash
 yarn add react-use-scroll-sync
 ```
@@ -67,6 +75,20 @@ yarn bootstrap
 yarn verify
 yarn demo:dev
 ```
+
+Useful root scripts:
+
+- `yarn build` builds the library into `dist/`
+- `yarn test` runs the Vitest suite
+- `yarn verify` runs lint, tests, library build and demo build
+- `yarn demo:dev` starts the Vite demo
+- `yarn demo:build` creates a production build of the demo
+- `yarn demo:preview` previews the built demo locally
+
+## Demo
+
+The demo app lives in [`example/`](./example) and imports the local library
+source through a Vite alias, so it uses the same React instance as the app.
 
 ## License
 
