@@ -1,66 +1,74 @@
 # react-use-scroll-sync
 
-[![npm version](https://badge.fury.io/js/react-use-scroll-sync.svg)](https://badge.fury.io/js/react-use-scroll-sync)
+[![npm version](https://badge.fury.io/js/react-use-scroll-sync.svg)](https://www.npmjs.com/package/react-use-scroll-sync)
 [![npm downloads](https://img.shields.io/npm/dt/react-use-scroll-sync.svg)](https://www.npmjs.com/package/react-use-scroll-sync)
 
-Custom react hook for synced scroll position across multiple scrollable
+React hook for synchronizing scroll position across multiple scrollable
 elements.
-
-![preview](https://media.giphy.com/media/SVlK5t83KhozwUfbKK/giphy.gif)
-
-## Demo
-
-https://gk4m.github.io/react-use-scroll-sync/
 
 ## Installation
 
-Install it with yarn:
-
-```
-yarn add react-use-scroll-sync
+```bash
+npm install react-use-scroll-sync
 ```
 
-Or with npm:
+## Usage
 
-```
-npm i react-use-scroll-sync --save
-```
-
-## How to use
-```typescript
-import * as React from "react"
+```tsx
+import { useMemo, useRef } from "react"
 import { useScrollSync } from "react-use-scroll-sync"
 
-const App = () => {
-  const ref1 = React.useRef<HTMLDivElement>(null)
-  const ref2 = React.useRef<HTMLDivElement>(null)
+export function Example() {
+  const leftRef = useRef<HTMLDivElement>(null)
+  const rightRef = useRef<HTMLDivElement>(null)
+  const refs = useMemo(() => [leftRef, rightRef], [])
 
-  useScrollSync([ref1, ref2], {
+  useScrollSync(refs, {
     horizontal: true,
     vertical: true,
-    proportional: true
+    proportional: true,
+    throttleWaitTime: 100,
   })
 
   return (
     <>
-      <div
-        ref={ref1}
-        style={{ overflow: "auto", width: "300px", height: "300px" }}
-      >
-        <div style={{ width: "500px" }}>Lorem ipsum dolor sit amet...</div>
+      <div ref={leftRef} style={{ overflow: "auto", width: 300, height: 300 }}>
+        <div style={{ width: 600, height: 800 }}>Left content</div>
       </div>
 
-      <div
-        ref={ref2}
-        style={{ overflow: "auto", width: "300px", height: "300px" }}
-      >
-        <div style={{ width: "500px" }}>Lorem ipsum dolor sit amet...</div>
+      <div ref={rightRef} style={{ overflow: "auto", width: 300, height: 300 }}>
+        <div style={{ width: 900, height: 1200 }}>Right content</div>
       </div>
     </>
   )
 }
-
 ```
+
+## Options
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `horizontal` | `boolean` | `true` | Sync horizontal scrolling. |
+| `vertical` | `boolean` | `true` | Sync vertical scrolling. |
+| `proportional` | `boolean` | `true` | Map by scroll ratio instead of copying the raw offset. |
+| `throttleWaitTime` | `number` | `100` | Delay in milliseconds before a sync is flushed. |
+
+## Notes
+
+- Pass at least two refs.
+- Keep the refs array stable between renders, for example with `useMemo`.
+- When an element has no scrollable overflow on an axis, the hook keeps the
+  synced position at `0` for that axis.
+
+## Development
+
+```bash
+npm install
+npm run lint
+npm test
+npm run build
+```
+
 ## License
 
 MIT

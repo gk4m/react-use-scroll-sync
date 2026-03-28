@@ -1,115 +1,187 @@
-import { RefObject, useEffect, useMemo, useRef } from "react"
-import throttle from "lodash/throttle"
+import { RefObject, useEffect, useRef } from "react"
 
 export type Options = {
   horizontal?: boolean
   vertical?: boolean
   proportional?: boolean
-  throttleWaitTime?: number // ms
+  throttleWaitTime?: number
 }
 
-const defaultOptions: Options = {
+type ResolvedOptions = Required<Options>
+
+const defaultOptions: ResolvedOptions = {
   horizontal: true,
   vertical: true,
   proportional: true,
-  throttleWaitTime: 100
+  throttleWaitTime: 100,
 }
 
 type ScrollSync = <T extends HTMLElement>(
-  refs: RefObject<T>[],
-  options?: Options
+  refs: ReadonlyArray<RefObject<T | null>>,
+  options?: Options,
 ) => void
 
-const updateScrollsPosition = <T extends HTMLElement>(
-  target: HTMLElement,
-  refs: RefObject<T>[],
-  options: Options
-) => {
-  const scrollLeftOffset =
-    target.scrollLeft / (target.scrollWidth - target.clientWidth)
+const getScrollableRange = (scrollSize: number, clientSize: number) =>
+  Math.max(scrollSize - clientSize, 0)
 
-  const scrollTopOffset =
-    target.scrollTop / (target.scrollHeight - target.clientHeight)
+const getScrollRatio = (scrollPosition: number, scrollSize: number, clientSize: number) => {
+  const range = getScrollableRange(scrollSize, clientSize)
+
+  if (range === 0) {
+    return 0
+  }
+
+  return scrollPosition / range
+}
+
+const updateScrollPositions = <T extends HTMLElement>(
+  target: HTMLElement,
+  refs: ReadonlyArray<RefObject<T | null>>,
+  options: ResolvedOptions,
+  ignoredElements: WeakSet<HTMLElement>,
+) => {
+  const horizontalRatio = getScrollRatio(
+    target.scrollLeft,
+    target.scrollWidth,
+    target.clientWidth,
+  )
+  const verticalRatio = getScrollRatio(
+    target.scrollTop,
+    target.scrollHeight,
+    target.clientHeight,
+  )
 
   refs.forEach(({ current }) => {
-    if (!current) return
+    if (!current || current === target) {
+      return
+    }
 
     if (options.vertical) {
-      const position = options.proportional
-        ? scrollTopOffset * (current.scrollHeight - current.clientHeight)
+      const nextScrollTop = options.proportional
+        ? verticalRatio * getScrollableRange(current.scrollHeight, current.clientHeight)
         : target.scrollTop
 
-      current.scrollTop = Math.round(position)
+      ignoredElements.add(current)
+      current.scrollTop = Math.round(nextScrollTop)
     }
 
     if (options.horizontal) {
-      const position = options.proportional
-        ? scrollLeftOffset * (current.scrollWidth - current.clientWidth)
+      const nextScrollLeft = options.proportional
+        ? horizontalRatio * getScrollableRange(current.scrollWidth, current.clientWidth)
         : target.scrollLeft
 
-      current.scrollLeft = Math.round(position)
+      ignoredElements.add(current)
+      current.scrollLeft = Math.round(nextScrollLeft)
     }
   })
 }
 
-const useScrollSyncOptions = (options = {}) =>
-  useMemo(
-    () => ({
-      ...defaultOptions,
-      ...options
-    }),
-    [JSON.stringify(options)] // eslint-disable-line react-hooks/exhaustive-deps
-  )
-
 export const useScrollSync: ScrollSync = (refs, options) => {
   if (refs.length < 2) {
-    throw Error("You need to pass at least two refs")
+    throw new Error("You need to pass at least two refs")
   }
 
-  const scrollSyncOptions = useScrollSyncOptions(options)
-  const throttleScrollRef = useRef() as React.MutableRefObject<Function>
+  const resolvedOptions: ResolvedOptions = {
+    horizontal: options?.horizontal ?? defaultOptions.horizontal,
+    vertical: options?.vertical ?? defaultOptions.vertical,
+    proportional: options?.proportional ?? defaultOptions.proportional,
+    throttleWaitTime: options?.throttleWaitTime ?? defaultOptions.throttleWaitTime,
+  }
+
+  const frameRef = useRef<number | null>(null)
+  const timeoutRef = useRef<number | null>(null)
+  const queuedTargetRef = useRef<HTMLElement | null>(null)
+  const optionsRef = useRef<ResolvedOptions>(resolvedOptions)
+  const ignoredElementsRef = useRef(new WeakSet<HTMLElement>())
+
+  optionsRef.current = resolvedOptions
 
   useEffect(() => {
-    const handleScroll = (
-      currentRefs: Array<React.MutableRefObject<HTMLElement>>,
-      { target }: Event
-    ) => {
-      if (!target) throw Error("Event target shouldn't be null")
+    const elements: HTMLElement[] = []
 
-      const refsWithoutTarget = currentRefs.filter(
-        ({ current }) => current !== target
-      )
+    refs.forEach(({ current }) => {
+      if (current) {
+        elements.push(current)
+      }
+    })
 
-      window.requestAnimationFrame(() => {
-        updateScrollsPosition(
-          target as HTMLElement,
-          refsWithoutTarget,
-          scrollSyncOptions
-        )
-      })
+    const clearPendingSync = () => {
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current)
+        frameRef.current = null
+      }
+
+      queuedTargetRef.current = null
     }
 
-    const scrollEvent = throttle(
-      handleScroll,
-      scrollSyncOptions.throttleWaitTime
-    )
+    const flushSync = () => {
+      frameRef.current = null
 
-    throttleScrollRef.current = scrollEvent
+      if (!queuedTargetRef.current) {
+        return
+      }
 
-    return scrollEvent.cancel
-  }, [scrollSyncOptions, throttleScrollRef])
+      updateScrollPositions(
+        queuedTargetRef.current,
+        refs,
+        optionsRef.current,
+        ignoredElementsRef.current,
+      )
 
-  useEffect(() => {
-    const scrollEvent = (e: Event) => throttleScrollRef.current(refs, e)
+      queuedTargetRef.current = null
+    }
 
-    refs.forEach(({ current }) =>
-      current?.addEventListener("scroll", scrollEvent)
-    )
+    const scheduleSync = (target: HTMLElement) => {
+      queuedTargetRef.current = target
+
+      if (timeoutRef.current !== null) {
+        return
+      }
+
+      timeoutRef.current = window.setTimeout(() => {
+        timeoutRef.current = null
+
+        if (frameRef.current !== null) {
+          window.cancelAnimationFrame(frameRef.current)
+        }
+
+        frameRef.current = window.requestAnimationFrame(flushSync)
+      }, optionsRef.current.throttleWaitTime)
+    }
+
+    const handleScroll = (event: Event) => {
+      const target = event.currentTarget
+
+      if (!(target instanceof HTMLElement)) {
+        return
+      }
+
+      if (ignoredElementsRef.current.has(target)) {
+        ignoredElementsRef.current.delete(target)
+        return
+      }
+
+      scheduleSync(target)
+    }
+
+    elements.forEach((element) => element.addEventListener("scroll", handleScroll))
 
     return () => {
-      refs.forEach(({ current }) =>
-        current?.removeEventListener("scroll", scrollEvent)
+      clearPendingSync()
+      elements.forEach((element) =>
+        element.removeEventListener("scroll", handleScroll),
       )
     }
-  }, [refs, throttleScrollRef])
+  }, [
+    refs,
+    resolvedOptions.horizontal,
+    resolvedOptions.proportional,
+    resolvedOptions.throttleWaitTime,
+    resolvedOptions.vertical,
+  ])
 }
