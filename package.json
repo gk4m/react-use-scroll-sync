@@ -40,12 +40,19 @@
   "engines": {
     "node": ">=18"
   },
+  "packageManager": "yarn@1.22.22",
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "bootstrap": "yarn install && yarn --cwd example install",
+    "demo:build": "yarn --cwd example build",
+    "demo:dev": "yarn --cwd example dev",
+    "demo:preview": "yarn --cwd example preview",
+    "dev": "yarn demo:dev",
     "lint": "tsc --noEmit",
-    "prepare": "npm run build",
+    "prepare": "yarn build",
     "test": "vitest run --environment jsdom",
-    "test:watch": "vitest --environment jsdom"
+    "test:watch": "vitest --environment jsdom",
+    "verify": "yarn lint && yarn test && yarn build && yarn demo:build"
   },
   "peerDependencies": {
     "react": ">=18"

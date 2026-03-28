@@ -9,7 +9,7 @@ elements.
 ## Installation
 
 ```bash
-npm install react-use-scroll-sync
+yarn add react-use-scroll-sync
 ```
 
 ## Usage
@@ -63,10 +63,9 @@ export function Example() {
 ## Development
 
 ```bash
-npm install
-npm run lint
-npm test
-npm run build
+yarn bootstrap
+yarn verify
+yarn demo:dev
 ```
 
 ## License

@@ -19,24 +19,24 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          cache: yarn
 
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
 
       - name: Typecheck
-        run: npm run lint
+        run: yarn lint
 
       - name: Test
-        run: npm test
+        run: yarn test
 
       - name: Build
-        run: npm run build
+        run: yarn build
 
       - name: Install demo dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
         working-directory: example
 
       - name: Build demo
-        run: npm run build
+        run: yarn build
         working-directory: example
