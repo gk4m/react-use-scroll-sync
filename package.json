@@ -1,6 +1,6 @@
 {
   "name": "react-use-scroll-sync",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "React hook for synchronizing scroll position across multiple elements.",
   "author": "gk4m",
   "license": "MIT",
