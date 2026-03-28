@@ -32,3 +32,11 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Install demo dependencies
+        run: npm ci
+        working-directory: example
+
+      - name: Build demo
+        run: npm run build
+        working-directory: example

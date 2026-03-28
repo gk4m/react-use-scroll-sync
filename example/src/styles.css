@@ -1,0 +1,168 @@
+:root {
+  color-scheme: light;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(255, 185, 112, 0.45), transparent 28%),
+    linear-gradient(180deg, #f7f2e8 0%, #f0ebe2 48%, #e7e2da 100%);
+  color: #201a16;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.page-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0 64px;
+}
+
+.hero {
+  max-width: 760px;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8d5b2b;
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(2.8rem, 6vw, 5.4rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.lede {
+  max-width: 640px;
+  margin: 18px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: rgba(32, 26, 22, 0.78);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border: 1px solid rgba(32, 26, 22, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 30px rgba(72, 52, 36, 0.08);
+}
+
+.toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: #cb5f2e;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.pane {
+  padding: 18px;
+  border: 1px solid rgba(32, 26, 22, 0.08);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: 0 24px 48px rgba(72, 52, 36, 0.12);
+  backdrop-filter: blur(14px);
+}
+
+.pane-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.pane-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.pane-header p {
+  margin: 4px 0 0;
+  color: rgba(32, 26, 22, 0.6);
+}
+
+.pane-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #1f1a17;
+  color: #fff7f1;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.scroll-frame {
+  overflow: auto;
+  height: 300px;
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 248, 236, 0.92), rgba(255, 255, 255, 0.75));
+}
+
+.scroll-body {
+  padding: 20px 22px;
+  border-top: 6px solid var(--accent);
+}
+
+.scroll-body p {
+  margin: 0 0 16px;
+  line-height: 1.65;
+  color: rgba(32, 26, 22, 0.82);
+}
+
+.scroll-body p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 900px) {
+  .page-shell {
+    width: min(100% - 20px, 760px);
+    padding-top: 28px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
